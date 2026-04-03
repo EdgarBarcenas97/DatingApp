@@ -31,6 +31,11 @@ kotlin {
             implementation(projects.feature.chat.domain)
             implementation(projects.feature.chat.presentation)
 
+            implementation(projects.feature.emergency.data)
+            implementation(projects.feature.emergency.database)
+            implementation(projects.feature.emergency.domain)
+            implementation(projects.feature.emergency.presentation)
+
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.bundles.koin.common)
 
