@@ -9,5 +9,6 @@ data class UserSerializable(
     val email: String,
     val username: String,
     val hasVerifiedEmail: Boolean,
+    val hasVerifiedFace: Boolean = false,
     val profilePictureUrl: String? = null
 )
