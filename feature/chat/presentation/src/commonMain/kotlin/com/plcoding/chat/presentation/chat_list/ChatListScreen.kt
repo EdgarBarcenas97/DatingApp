@@ -58,6 +58,7 @@ fun ChatListRoot(
     onSuccessfulLogout: () -> Unit,
     onCreateChatClick: () -> Unit,
     onProfileSettingsClick: () -> Unit,
+    onEmergencyContactClick: () -> Unit = {},
     viewModel: ChatListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -89,6 +90,7 @@ fun ChatListRoot(
                 is ChatListAction.OnSelectChat -> onChatClick(action.chatId)
                 ChatListAction.OnCreateChatClick -> onCreateChatClick()
                 ChatListAction.OnProfileSettingsClick -> onProfileSettingsClick()
+                ChatListAction.OnEmergencyContactClick -> onEmergencyContactClick()
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -148,6 +150,9 @@ fun ChatListScreen(
                 },
                 onProfileSettingsClick = {
                     onAction(ChatListAction.OnProfileSettingsClick)
+                },
+                onEmergencyContactClick = {
+                    onAction(ChatListAction.OnEmergencyContactClick)
                 }
             )
             when {

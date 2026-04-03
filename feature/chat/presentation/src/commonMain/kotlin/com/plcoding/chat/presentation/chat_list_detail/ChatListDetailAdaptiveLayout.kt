@@ -32,6 +32,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ChatListDetailAdaptiveLayout(
     initialChatId: String?,
     onLogout: () -> Unit,
+    onEmergencyContactClick: () -> Unit = {},
     chatListDetailViewModel: ChatListDetailViewModel = koinViewModel()
 ) {
     val sharedState by chatListDetailViewModel.state.collectAsStateWithLifecycle()
@@ -86,6 +87,7 @@ fun ChatListDetailAdaptiveLayout(
                     onProfileSettingsClick = {
                         chatListDetailViewModel.onAction(ChatListDetailAction.OnProfileSettingsClick)
                     },
+                    onEmergencyContactClick = onEmergencyContactClick,
                 )
             }
         },

@@ -38,6 +38,7 @@ fun ChatListHeader(
     onUserAvatarClick: () -> Unit,
     onDismissMenu: () -> Unit,
     onProfileSettingsClick: () -> Unit,
+    onEmergencyContactClick: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -66,6 +67,7 @@ fun ChatListHeader(
                 onClick = onUserAvatarClick,
                 onDismissMenu = onDismissMenu,
                 onProfileSettingsClick = onProfileSettingsClick,
+                onEmergencyContactClick = onEmergencyContactClick,
                 onLogoutClick = onLogoutClick,
             )
         }
@@ -79,6 +81,7 @@ fun ProfileAvatarSection(
     onClick: () -> Unit,
     onDismissMenu: () -> Unit,
     onProfileSettingsClick: () -> Unit,
+    onEmergencyContactClick: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -102,6 +105,12 @@ fun ProfileAvatarSection(
                     icon = vectorResource(Res.drawable.users_icon),
                     contentColor = MaterialTheme.colorScheme.extended.textSecondary,
                     onClick = onProfileSettingsClick
+                ),
+                DropDownItem(
+                    title = "Contacto de Emergencia",
+                    icon = vectorResource(Res.drawable.users_icon),
+                    contentColor = MaterialTheme.colorScheme.extended.textSecondary,
+                    onClick = onEmergencyContactClick
                 ),
                 DropDownItem(
                     title = stringResource(Res.string.logout),
@@ -132,6 +141,7 @@ fun ChatListHeaderPreview() {
                 onUserAvatarClick = {},
                 onDismissMenu = {},
                 onProfileSettingsClick = {},
+                onEmergencyContactClick = {},
                 onLogoutClick = {}
             )
         }

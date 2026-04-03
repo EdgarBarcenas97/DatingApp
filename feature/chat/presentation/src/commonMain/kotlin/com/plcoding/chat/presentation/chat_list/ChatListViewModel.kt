@@ -84,6 +84,7 @@ class ChatListViewModel(
                 ) }
             }
             ChatListAction.OnProfileSettingsClick,
+            ChatListAction.OnEmergencyContactClick,
             ChatListAction.OnDismissUserMenu -> {
                 _state.update { it.copy(
                     isUserMenuOpen = false

@@ -7,6 +7,8 @@ import com.plcoding.auth.presentation.navigation.AuthGraphRoutes
 import com.plcoding.auth.presentation.navigation.authGraph
 import com.plcoding.chat.presentation.navigation.ChatGraphRoutes
 import com.plcoding.chat.presentation.navigation.chatGraph
+import com.plcoding.emergency.presentation.navigation.EmergencyGraphRoutes
+import com.plcoding.emergency.presentation.navigation.emergencyGraph
 
 @Composable
 fun NavigationRoot(
@@ -35,6 +37,15 @@ fun NavigationRoot(
                         inclusive = true
                     }
                 }
+            },
+            onEmergencyContactClick = {
+                navController.navigate(EmergencyGraphRoutes.Graph)
+            }
+        )
+        emergencyGraph(
+            navController = navController,
+            onBack = {
+                navController.popBackStack()
             }
         )
     }
