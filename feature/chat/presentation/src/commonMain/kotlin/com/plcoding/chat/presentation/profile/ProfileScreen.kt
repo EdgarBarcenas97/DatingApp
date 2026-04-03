@@ -36,6 +36,8 @@ import chirp.feature.chat.presentation.generated.resources.cancel
 import chirp.feature.chat.presentation.generated.resources.contact_chirp_support_change_email
 import chirp.feature.chat.presentation.generated.resources.current_password
 import chirp.feature.chat.presentation.generated.resources.delete
+import chirp.feature.chat.presentation.generated.resources.delete_account
+import chirp.feature.chat.presentation.generated.resources.delete_account_header
 import chirp.feature.chat.presentation.generated.resources.delete_profile_picture
 import chirp.feature.chat.presentation.generated.resources.delete_profile_picture_desc
 import chirp.feature.chat.presentation.generated.resources.email
@@ -47,6 +49,7 @@ import chirp.feature.chat.presentation.generated.resources.profile_image
 import chirp.feature.chat.presentation.generated.resources.save
 import chirp.feature.chat.presentation.generated.resources.upload_icon
 import chirp.feature.chat.presentation.generated.resources.upload_image
+import com.plcoding.chat.presentation.profile.components.DeleteAccountSurveyDialog
 import com.plcoding.chat.presentation.profile.components.DragAndDropOverlay
 import com.plcoding.chat.presentation.profile.components.ProfileHeaderSection
 import com.plcoding.chat.presentation.profile.components.ProfileSectionLayout
@@ -64,6 +67,7 @@ import com.plcoding.core.designsystem.components.textfields.ChirpTextField
 import com.plcoding.core.designsystem.theme.ChirpTheme
 import com.plcoding.core.designsystem.theme.extended
 import com.plcoding.core.presentation.util.DeviceConfiguration
+import com.plcoding.core.presentation.util.ObserveAsEvents
 import com.plcoding.core.presentation.util.clearFocusOnTap
 import com.plcoding.core.presentation.util.currentDeviceConfiguration
 import org.jetbrains.compose.resources.stringResource
@@ -74,9 +78,16 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileRoot(
     onDismiss: () -> Unit,
+    onAccountDeleted: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is ProfileEvent.OnAccountDeleted -> onAccountDeleted()
+        }
+    }
 
     val launcher = rememberImagePickerLauncher { pickedImageData ->
         viewModel.onAction(ProfileAction.OnPictureSelected(
@@ -278,6 +289,18 @@ fun ProfileScreen(
                 )
             }
         }
+        ChirpHorizontalDivider()
+        ProfileSectionLayout(
+            headerText = stringResource(Res.string.delete_account_header)
+        ) {
+            ChirpButton(
+                text = stringResource(Res.string.delete_account),
+                onClick = {
+                    onAction(ProfileAction.OnDeleteAccountClick)
+                },
+                style = ChirpButtonStyle.DESTRUCTIVE_SECONDARY
+            )
+        }
         val deviceConfiguration = currentDeviceConfiguration()
         if(deviceConfiguration in listOf(
                 DeviceConfiguration.MOBILE_PORTRAIT,
@@ -305,6 +328,16 @@ fun ProfileScreen(
             },
             onDismiss = {
                 onAction(ProfileAction.OnDismissDeleteConfirmationDialogClick)
+            }
+        )
+    }
+
+    if(state.showDeleteAccountSurvey) {
+        DeleteAccountSurveyDialog(
+            state = state,
+            onAction = onAction,
+            onDismiss = {
+                onAction(ProfileAction.OnDismissDeleteAccountSurvey)
             }
         )
     }

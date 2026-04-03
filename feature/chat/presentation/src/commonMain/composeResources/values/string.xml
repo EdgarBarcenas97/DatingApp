@@ -59,4 +59,19 @@
     <string name="error_current_password_incorrect">Your current password is not correct</string>
     <string name="error_current_password_equal_to_new_one">Your new password can't be equal to the old one.</string>
     <string name="error_invalid_file_type">This file type is not supported.</string>
+
+    <string name="delete_account">Delete account</string>
+    <string name="delete_account_header">Account</string>
+    <string name="delete_account_title">Delete your account?</string>
+    <string name="delete_account_description">This will permanently delete your account and all your data. This action cannot be undone.</string>
+    <string name="delete_account_confirm">Delete my account</string>
+    <string name="why_are_you_leaving">Why are you leaving?</string>
+    <string name="reason_found_someone">I found someone</string>
+    <string name="reason_not_finding_matches">I\'m not finding good matches</string>
+    <string name="reason_privacy_concerns">Privacy concerns</string>
+    <string name="reason_too_many_notifications">Too many notifications</string>
+    <string name="reason_bad_experience">Bad experience with other users</string>
+    <string name="reason_taking_a_break">Taking a break from dating</string>
+    <string name="reason_other">Other</string>
+    <string name="reason_other_placeholder">Tell us more (optional)</string>
 </resources>

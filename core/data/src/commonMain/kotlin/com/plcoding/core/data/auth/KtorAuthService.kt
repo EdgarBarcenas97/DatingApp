@@ -2,6 +2,7 @@ package com.plcoding.core.data.auth
 
 import com.plcoding.core.data.dto.AuthInfoSerializable
 import com.plcoding.core.data.dto.requests.ChangePasswordRequest
+import com.plcoding.core.data.dto.requests.DeleteAccountRequest
 import com.plcoding.core.data.dto.requests.EmailRequest
 import com.plcoding.core.data.dto.requests.LoginRequest
 import com.plcoding.core.data.dto.requests.RefreshRequest
@@ -107,6 +108,21 @@ class KtorAuthService(
         return httpClient.post<RefreshRequest, Unit>(
             route = "/auth/logout",
             body = RefreshRequest(refreshToken)
+        ).onSuccess {
+            httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+        }
+    }
+
+    override suspend fun deleteAccount(
+        reason: String,
+        details: String?
+    ): EmptyResult<DataError.Remote> {
+        return httpClient.post<DeleteAccountRequest, Unit>(
+            route = "/auth/delete-account",
+            body = DeleteAccountRequest(
+                reason = reason,
+                details = details
+            )
         ).onSuccess {
             httpClient.authProvider<BearerAuthProvider>()?.clearToken()
         }

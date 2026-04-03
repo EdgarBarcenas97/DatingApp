@@ -19,6 +19,7 @@ import com.plcoding.core.domain.util.onSuccess
 import com.plcoding.core.domain.validation.PasswordValidator
 import com.plcoding.core.presentation.util.UiText
 import com.plcoding.core.presentation.util.toUiText
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,6 +37,9 @@ class ProfileViewModel(
     private val chatParticipantRepository: ChatParticipantRepository,
     private val sessionStorage: SessionStorage,
 ) : ViewModel() {
+
+    private val eventChannel = Channel<ProfileEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     private var hasLoadedInitialData = false
 
@@ -74,6 +79,10 @@ class ProfileViewModel(
             is ProfileAction.OnDeletePictureClick -> showDeleteConfirmation()
             is ProfileAction.OnConfirmDeleteClick -> deleteProfilePicture()
             is ProfileAction.OnDismissDeleteConfirmationDialogClick -> dismissDeleteConfirmation()
+            is ProfileAction.OnDeleteAccountClick -> showDeleteAccountSurvey()
+            is ProfileAction.OnSelectDeleteReason -> selectDeleteReason(action.reason)
+            is ProfileAction.OnConfirmDeleteAccount -> deleteAccount()
+            is ProfileAction.OnDismissDeleteAccountSurvey -> dismissDeleteAccountSurvey()
             else -> Unit
         }
     }
@@ -192,6 +201,51 @@ class ProfileViewModel(
                 canChangePassword = isCurrentValid && isNewValid
             ) }
         }.launchIn(viewModelScope)
+    }
+
+    private fun showDeleteAccountSurvey() {
+        _state.update { it.copy(showDeleteAccountSurvey = true) }
+    }
+
+    private fun dismissDeleteAccountSurvey() {
+        _state.update { it.copy(
+            showDeleteAccountSurvey = false,
+            selectedDeleteReason = null,
+            isDeletingAccount = false
+        ) }
+    }
+
+    private fun selectDeleteReason(reason: DeleteAccountReason) {
+        _state.update { it.copy(selectedDeleteReason = reason) }
+    }
+
+    private fun deleteAccount() {
+        val selectedReason = state.value.selectedDeleteReason ?: return
+        if (state.value.isDeletingAccount) return
+
+        _state.update { it.copy(isDeletingAccount = true) }
+
+        viewModelScope.launch {
+            val reason = selectedReason.name.lowercase()
+            val details = if (selectedReason == DeleteAccountReason.OTHER) {
+                state.value.otherReasonText.text.toString().takeIf { it.isNotBlank() }
+            } else null
+
+            authService
+                .deleteAccount(
+                    reason = reason,
+                    details = details
+                )
+                .onSuccess {
+                    sessionStorage.set(null)
+                    eventChannel.send(ProfileEvent.OnAccountDeleted)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(
+                        isDeletingAccount = false
+                    ) }
+                }
+        }
     }
 
     private fun changePassword() {

@@ -35,4 +35,9 @@ interface AuthService {
     ): EmptyResult<DataError.Remote>
 
     suspend fun logout(refreshToken: String): EmptyResult<DataError.Remote>
+
+    suspend fun deleteAccount(
+        reason: String,
+        details: String?
+    ): EmptyResult<DataError.Remote>
 }

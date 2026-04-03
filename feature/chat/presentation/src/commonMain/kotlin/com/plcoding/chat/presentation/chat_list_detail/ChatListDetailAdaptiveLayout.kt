@@ -147,7 +147,8 @@ fun ChatListDetailAdaptiveLayout(
         ProfileRoot(
             onDismiss = {
                 chatListDetailViewModel.onAction(ChatListDetailAction.OnDismissCurrentDialog)
-            }
+            },
+            onAccountDeleted = onLogout
         )
     }
 }

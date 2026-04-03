@@ -19,5 +19,9 @@ data class ProfileState(
     val isChangingPassword: Boolean = false,
     val newPasswordError: UiText? = null,
     val canChangePassword: Boolean = false,
-    val isPasswordChangeSuccessful: Boolean = false
+    val isPasswordChangeSuccessful: Boolean = false,
+    val showDeleteAccountSurvey: Boolean = false,
+    val selectedDeleteReason: DeleteAccountReason? = null,
+    val otherReasonText: TextFieldState = TextFieldState(),
+    val isDeletingAccount: Boolean = false
 )
