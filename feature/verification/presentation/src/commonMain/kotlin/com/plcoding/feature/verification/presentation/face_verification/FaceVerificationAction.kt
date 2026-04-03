@@ -1,6 +1,8 @@
 package com.plcoding.feature.verification.presentation.face_verification
 
 sealed interface FaceVerificationAction {
+    data object OnUploadPictureClick : FaceVerificationAction
+
     data class OnImageSelected(val bytes: ByteArray, val mimeType: String?) : FaceVerificationAction {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
