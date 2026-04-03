@@ -12,6 +12,7 @@ import com.plcoding.chirp.navigation.DeepLinkListener
 import com.plcoding.chirp.navigation.NavigationRoot
 import com.plcoding.core.designsystem.theme.ChirpTheme
 import com.plcoding.core.presentation.util.ObserveAsEvents
+import com.plcoding.emergency.presentation.panic.PanicOverlay
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -56,6 +57,9 @@ fun App(
                     AuthGraphRoutes.Graph
                 }
             )
+            if(state.isLoggedIn) {
+                PanicOverlay()
+            }
             DeepLinkListener(navController, onDeepLinkListenerSetup)
         }
     }
