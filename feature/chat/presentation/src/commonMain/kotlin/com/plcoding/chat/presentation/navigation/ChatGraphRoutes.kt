@@ -7,6 +7,7 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.plcoding.chat.presentation.chat_list_detail.ChatListDetailAdaptiveLayout
+import com.plcoding.feature.verification.presentation.face_verification.FaceVerificationRoot
 import kotlinx.serialization.Serializable
 
 sealed interface ChatGraphRoutes {
@@ -15,6 +16,9 @@ sealed interface ChatGraphRoutes {
 
     @Serializable
     data class ChatListDetailRoute(val chatId: String? = null): ChatGraphRoutes
+
+    @Serializable
+    data object FaceVerification: ChatGraphRoutes
 }
 
 fun NavGraphBuilder.chatGraph(
@@ -34,7 +38,21 @@ fun NavGraphBuilder.chatGraph(
             val route = backStackEntry.toRoute<ChatGraphRoutes.ChatListDetailRoute>()
             ChatListDetailAdaptiveLayout(
                 initialChatId = route.chatId,
-                onLogout = onLogout
+                onLogout = onLogout,
+                onNavigateToFaceVerification = {
+                    navController.navigate(ChatGraphRoutes.FaceVerification)
+                }
+            )
+        }
+
+        composable<ChatGraphRoutes.FaceVerification> {
+            FaceVerificationRoot(
+                onSuccess = {
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    navController.popBackStack()
+                }
             )
         }
     }

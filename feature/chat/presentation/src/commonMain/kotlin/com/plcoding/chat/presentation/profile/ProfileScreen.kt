@@ -74,6 +74,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileRoot(
     onDismiss: () -> Unit,
+    onNavigateToFaceVerification: () -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -95,6 +96,10 @@ fun ProfileRoot(
                     is ProfileAction.OnDismiss -> onDismiss()
                     is ProfileAction.OnUploadPictureClick -> {
                         launcher.launch()
+                    }
+                    is ProfileAction.OnVerifyIdentityClick -> {
+                        onDismiss()
+                        onNavigateToFaceVerification()
                     }
                     else -> Unit
                 }
