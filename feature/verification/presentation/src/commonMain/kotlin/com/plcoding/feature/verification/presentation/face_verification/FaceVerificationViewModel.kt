@@ -29,6 +29,9 @@ class FaceVerificationViewModel(
 
     fun onAction(action: FaceVerificationAction) {
         when (action) {
+            is FaceVerificationAction.OnUploadPictureClick -> {
+                // This will be handled by the composable
+            }
             is FaceVerificationAction.OnImageSelected -> selectImage(action.bytes, action.mimeType)
             is FaceVerificationAction.OnVerifyClick -> verifyFace()
             is FaceVerificationAction.OnRetryClick -> retryVerification()

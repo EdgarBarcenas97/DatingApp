@@ -1,8 +1,13 @@
 package com.plcoding.feature.verification.presentation.face_verification
 
-import androidx.compose.foundation.border
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,38 +16,38 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import com.plcoding.core.designsystem.components.buttons.ChirpButton
 import com.plcoding.core.designsystem.components.buttons.ChirpButtonStyle
 import com.plcoding.core.designsystem.components.layouts.ChirpSnackbarScaffold
-import com.plcoding.core.designsystem.theme.ChirpTheme
+import com.plcoding.feature.verification.presentation.face_verification.components.FaceVerificationFeedback
+import com.plcoding.feature.verification.presentation.face_verification.components.FaceVerificationGuidelineDialog
+import com.plcoding.feature.verification.presentation.face_verification.components.FaceVerificationImagePreview
+import com.plcoding.feature.verification.presentation.face_verification.components.FeedbackType
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun FaceVerificationRoot(
     viewModel: FaceVerificationViewModel = koinViewModel(),
     onSuccess: () -> Unit,
     onDismiss: () -> Unit,
+    onUploadPicture: (callback: (ByteArray, String?) -> Unit) -> Unit = { _ -> }
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -51,6 +56,11 @@ fun FaceVerificationRoot(
         onAction = { action ->
             when (action) {
                 is FaceVerificationAction.OnDismiss -> onDismiss()
+                is FaceVerificationAction.OnUploadPictureClick -> {
+                    onUploadPicture { bytes, mimeType ->
+                        viewModel.onAction(FaceVerificationAction.OnImageSelected(bytes, mimeType))
+                    }
+                }
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -92,38 +102,54 @@ fun FaceVerificationScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                when (state.currentStep) {
-                    VerificationStep.INITIAL -> {
-                        InitialContent(onAction = onAction)
-                    }
-                    VerificationStep.IMAGE_SELECTED -> {
-                        ImageSelectedContent(
-                            imageBytes = state.selectedImageBytes,
-                            onAction = onAction
-                        )
-                    }
-                    VerificationStep.UPLOADING, VerificationStep.VERIFYING -> {
-                        LoadingContent(
-                            step = state.currentStep,
-                            isUploading = state.isUploading
-                        )
-                    }
-                    VerificationStep.SUCCESS -> {
-                        SuccessContent(
-                            confidence = state.verificationResult?.confidence,
-                            onSuccess = onSuccess
-                        )
-                    }
-                    VerificationStep.FAILED -> {
-                        FailedContent(
-                            errorMessage = state.errorMessage,
-                            retryCount = state.retryCount,
-                            onAction = onAction
-                        )
+                AnimatedContent(
+                    targetState = state.currentStep,
+                    transitionSpec = {
+                        (slideInVertically { it } + fadeIn()).togetherWith(
+                            slideOutVertically { -it } + fadeOut()
+                        ).using(SizeTransform(clip = false))
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) { step ->
+                    when (step) {
+                        VerificationStep.INITIAL -> {
+                            InitialContent(onAction = onAction)
+                        }
+                        VerificationStep.IMAGE_SELECTED -> {
+                            ImageSelectedContent(
+                                imageBytes = state.selectedImageBytes,
+                                onAction = onAction
+                            )
+                        }
+                        VerificationStep.UPLOADING, VerificationStep.VERIFYING -> {
+                            LoadingContent(
+                                step = step,
+                                isUploading = state.isUploading
+                            )
+                        }
+                        VerificationStep.SUCCESS -> {
+                            SuccessContent(
+                                confidence = state.verificationResult?.confidence,
+                                onSuccess = onSuccess
+                            )
+                        }
+                        VerificationStep.FAILED -> {
+                            FailedContent(
+                                errorMessage = state.errorMessage,
+                                retryCount = state.retryCount,
+                                onAction = onAction
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+
+    if (state.showGuidelinesDialog) {
+        FaceVerificationGuidelineDialog(
+            onDismiss = { onAction(FaceVerificationAction.OnGuidelinesDismiss) }
+        )
     }
 }
 
@@ -182,27 +208,11 @@ private fun ImageSelectedContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (imageBytes != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = RoundedCornerShape(12.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                AsyncImage(
-                    model = imageBytes,
-                    contentDescription = "Selected face photo",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
+            FaceVerificationImagePreview(
+                imageBytes = imageBytes,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
 
         ChirpButton(
             text = "Verificar Rostro",
@@ -259,24 +269,20 @@ private fun SuccessContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "✓ Identidad Verificada",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
+        FaceVerificationFeedback(
+            type = FeedbackType.SUCCESS,
+            message = "Tu identidad ha sido verificada exitosamente",
+            modifier = Modifier.fillMaxWidth()
         )
-        Text(
-            text = "Tu identidad ha sido verificada exitosamente",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         if (confidence != null) {
             Text(
                 text = "Confianza: ${(confidence * 100).toInt()}%",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 32.dp)
             )
         }
 
@@ -303,17 +309,12 @@ private fun FailedContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Validación Fallida",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Text(
-            text = errorMessage ?: "No se pudo validar tu rostro. Intenta nuevamente.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(bottom = 32.dp),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        FaceVerificationFeedback(
+            type = FeedbackType.ERROR,
+            message = errorMessage ?: "No se pudo validar tu rostro. Intenta nuevamente.",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
         )
 
         if (retryCount < 3) {
@@ -333,11 +334,11 @@ private fun FailedContent(
             )
         } else {
             Text(
-                text = "Máximo de intentos alcanzado. Por favor, contacta a soporte.",
+                text = "Máximo de intentos alcanzado.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(bottom = 16.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
 
             ChirpButton(
