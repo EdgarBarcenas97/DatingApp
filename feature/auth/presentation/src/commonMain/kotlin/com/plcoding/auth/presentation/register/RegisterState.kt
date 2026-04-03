@@ -1,6 +1,7 @@
 package com.plcoding.auth.presentation.register
 
 import androidx.compose.foundation.text.input.TextFieldState
+import com.plcoding.core.domain.auth.LookingFor
 import com.plcoding.core.presentation.util.UiText
 
 data class RegisterState(
@@ -13,6 +14,7 @@ data class RegisterState(
     val usernameTextState: TextFieldState = TextFieldState(),
     val isUsernameValid: Boolean = false,
     val usernameError: UiText? = null,
+    val selectedLookingFor: LookingFor? = null,
     val registrationError: UiText? = null,
     val isRegistering: Boolean = false,
     val canRegister: Boolean = false,

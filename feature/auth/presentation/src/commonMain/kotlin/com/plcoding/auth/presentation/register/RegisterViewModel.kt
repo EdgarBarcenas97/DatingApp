@@ -68,14 +68,19 @@ class RegisterViewModel(
         .map { it.isRegistering }
         .distinctUntilChanged()
 
+    private val isLookingForSelectedFlow = state
+        .map { it.selectedLookingFor != null }
+        .distinctUntilChanged()
+
     private fun observeValidationStates() {
         combine(
             isEmailValidFlow,
             isUsernameValidFlow,
             isPasswordValidFlow,
-            isRegisteringFlow
-        ) { isEmailValid, isUsernameValid, isPasswordValid, isRegistering ->
-            val allValid = isEmailValid && isUsernameValid && isPasswordValid
+            isRegisteringFlow,
+            isLookingForSelectedFlow
+        ) { isEmailValid, isUsernameValid, isPasswordValid, isRegistering, isLookingForSelected ->
+            val allValid = isEmailValid && isUsernameValid && isPasswordValid && isLookingForSelected
             _state.update { it.copy(
                 canRegister = !isRegistering && allValid
             ) }
@@ -89,6 +94,11 @@ class RegisterViewModel(
             RegisterAction.OnTogglePasswordVisibilityClick -> {
                 _state.update { it.copy(
                     isPasswordVisible = !it.isPasswordVisible
+                ) }
+            }
+            is RegisterAction.OnLookingForSelect -> {
+                _state.update { it.copy(
+                    selectedLookingFor = action.lookingFor
                 ) }
             }
             else -> Unit
@@ -108,12 +118,14 @@ class RegisterViewModel(
             val email = state.value.emailTextState.text.toString()
             val username = state.value.usernameTextState.text.toString()
             val password = state.value.passwordTextState.text.toString()
+            val lookingFor = state.value.selectedLookingFor ?: return@launch
 
             authService
                 .register(
                     email = email,
                     username = username,
-                    password = password
+                    password = password,
+                    lookingFor = lookingFor
                 )
                 .onSuccess {
                     _state.update { it.copy(

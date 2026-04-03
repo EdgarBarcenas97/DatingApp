@@ -13,7 +13,8 @@ interface AuthService {
     suspend fun register(
         email: String,
         username: String,
-        password: String
+        password: String,
+        lookingFor: LookingFor
     ): EmptyResult<DataError.Remote>
 
     suspend fun resendVerificationEmail(

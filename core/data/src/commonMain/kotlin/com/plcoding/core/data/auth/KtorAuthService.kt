@@ -12,6 +12,7 @@ import com.plcoding.core.data.networking.get
 import com.plcoding.core.data.networking.post
 import com.plcoding.core.domain.auth.AuthInfo
 import com.plcoding.core.domain.auth.AuthService
+import com.plcoding.core.domain.auth.LookingFor
 import com.plcoding.core.domain.util.DataError
 import com.plcoding.core.domain.util.EmptyResult
 import com.plcoding.core.domain.util.Result
@@ -44,14 +45,16 @@ class KtorAuthService(
     override suspend fun register(
         email: String,
         username: String,
-        password: String
+        password: String,
+        lookingFor: LookingFor
     ): EmptyResult<DataError.Remote> {
         return httpClient.post(
             route = "/auth/register",
             body = RegisterRequest(
                 email = email,
                 username = username,
-                password = password
+                password = password,
+                lookingFor = lookingFor.name
             )
         )
     }

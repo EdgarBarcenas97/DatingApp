@@ -37,6 +37,13 @@
     <string name="error_invalid_credentials">The email or password is incorrect</string>
     <string name="error_email_not_verified">Unable to login because your email isn't verified</string>
     <string name="error_same_password">The new password can't be equal to the old one</string>
+    <string name="looking_for_title">What are you looking for?</string>
+    <string name="looking_for_serious_relationship">Serious relationship</string>
+    <string name="looking_for_casual_dating">Casual dating</string>
+    <string name="looking_for_friendship">Friendship</string>
+    <string name="looking_for_one_night_stand">One night stand</string>
+    <string name="looking_for_open_relationship">Open relationship</string>
+    <string name="looking_for_not_sure_yet">Not sure yet</string>
     <string name="error_reset_password_token_invalid">
         It seems like the reset password link is not valid or has expired. Please request a new email.
     </string>
