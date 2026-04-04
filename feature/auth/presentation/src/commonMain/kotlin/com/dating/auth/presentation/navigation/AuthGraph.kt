@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.dating.auth.presentation.email_verification.EmailVerificationRoot
+import com.dating.auth.presentation.feature_tour.FeatureTourRoot
 import com.dating.auth.presentation.forgot_password.ForgotPasswordRoot
 import com.dating.auth.presentation.login.LoginRoot
 import com.dating.auth.presentation.onboarding.OnboardingRoot
@@ -105,8 +106,19 @@ fun NavGraphBuilder.authGraph(
         composable<AuthGraphRoutes.RegisterSuccess> {
             RegisterSuccessRoot(
                 onLoginClick = {
-                    navController.navigate(AuthGraphRoutes.Login) {
+                    navController.navigate(AuthGraphRoutes.FeatureTour) {
                         popUpTo<AuthGraphRoutes.RegisterSuccess> {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+        composable<AuthGraphRoutes.FeatureTour> {
+            FeatureTourRoot(
+                onFinish = {
+                    navController.navigate(AuthGraphRoutes.Login) {
+                        popUpTo<AuthGraphRoutes.FeatureTour> {
                             inclusive = true
                         }
                     }

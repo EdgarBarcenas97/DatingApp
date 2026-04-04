@@ -62,6 +62,17 @@
     <string name="onboarding_body">Find your perfect match today.</string>
     <string name="onboarding_terms">By continuing, you agree to our Terms of Service and Privacy Policy.</string>
 
+    <!-- Feature Tour -->
+    <string name="feature_tour_welcome_title">Welcome to Aura!</string>
+    <string name="feature_tour_welcome_description">Discover a safer and smarter way to date. Here\'s what makes us different.</string>
+    <string name="feature_tour_emergency_title">Emergency Contact</string>
+    <string name="feature_tour_emergency_description">Add a trusted emergency contact who can track your date in real time. Your safety is our priority.</string>
+    <string name="feature_tour_schedule_title">Schedule Your Date</string>
+    <string name="feature_tour_schedule_description">Arrange a date directly with your match. Set the day, time, and place — all within the app.</string>
+    <string name="feature_tour_next">Next</string>
+    <string name="feature_tour_get_started">Get Started</string>
+    <string name="feature_tour_skip">Skip</string>
+
     <!-- Registration - Step 1 (Username) -->
     <string name="what_is_your_name">¿Cómo te llamas?</string>
     <string name="enter_your_name">Introduce tu nombre</string>

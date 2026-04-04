@@ -29,4 +29,7 @@ sealed interface AuthGraphRoutes {
 
     @Serializable
     data object Onboarding : AuthGraphRoutes
+
+    @Serializable
+    data object FeatureTour : AuthGraphRoutes
 }
