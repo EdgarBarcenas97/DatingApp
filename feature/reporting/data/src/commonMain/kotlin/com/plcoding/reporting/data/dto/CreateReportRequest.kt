@@ -1,0 +1,12 @@
+package com.plcoding.reporting.data.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class CreateReportRequest(
+    val reportedUserId: String,
+    val messageId: String?,
+    val chatId: String,
+    val type: String,
+    val description: String
+)
